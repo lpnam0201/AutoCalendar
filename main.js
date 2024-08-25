@@ -4,7 +4,7 @@ var ticksPerHour = 60 * ticksPerMin;
 var ticksPerDay = 24 * ticksPerHour;
 
 function main() {
-  let events = createEvents(2, Date.now());
+  let events = createEvents(2, new Date('2024-08-24T00:00:00'));
 }
 
 function createEvents(beginningWeek, currentDate) {
@@ -27,7 +27,7 @@ function createEvents(beginningWeek, currentDate) {
     const weekDates = determineNextWeek(currentDate);
     const weekData = groupedByWeek[week];
 
-    const groupedByWeekDay = Object.groupBy(weekData, x => x.WeekDay);
+    const groupedByWeekDay = Object.groupBy(weekData, x => x.Weekday);
     for (let weekDay in groupedByWeekDay)
     { 
       const weekDayDate = weekDates
