@@ -69,13 +69,16 @@ function createEvents(beginningWeek, currentDate) {
       for (let subjectName in groupedBySubjectName)
       {
         const subjectData = groupedBySubjectName[subjectName];
+        const room = subjectData[0].Room;
+
         const beginPeriod = Math.min(...subjectData.map(o => o.Period));
         const endPeriod = Math.max(...subjectData.map(o => o.Period));
 
         let calendarEvent = {};
         calendarEvent.startTime = mapPeriodToStartEnd(beginPeriod, weekDayDate).begin;
         calendarEvent.endTime = mapPeriodToStartEnd(endPeriod, weekDayDate).end;
-        calendarEvent.title = subjectName;
+
+        calendarEvent.title = `${subjectName} - ${room}`;
         calendarEvent.tags = ["auto_tool"];
 
         calendarEvents.push(calendarEvent);
@@ -130,7 +133,12 @@ function mapPeriodToStartEnd(period, weekDayDate) {
 
   let offsetTicks = ticksPerPeriod * offset;
   beginTicks = weekDayDateAt0.getTime() + firstPeriodTicks + offsetTicks
-  endTicks = weekDayDateAt0.getTime() + firstPeriodTicks  + offsetTicks + ticksPerPeriod;
+  endTicks = weekDayDateAt0.getTime() + firstPeriodTicks + offsetTicks + ticksPerPeriod;
+
+  // if it's the final period => add 15min break
+  if (period === 5 || period === 11) {
+    endTicks += ticksPerMin * 15;
+  }
 
   periodBeginEnd.begin = new Date(beginTicks)
   periodBeginEnd.end = new Date(endTicks);
