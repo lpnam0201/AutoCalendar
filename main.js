@@ -4,16 +4,47 @@ var ticksPerHour = 60 * ticksPerMin;
 var ticksPerDay = 24 * ticksPerHour;
 
 function main() {
-  let events = createEvents(2, new Date('2024-08-24T00:00:00'));
+  const beginSearchDate = new Date('2024-08-24T00:00:00');
+  const endSearchDate = new Date('2027-08-24T00:00:00');
+  let events = createEvents(2, beginSearchDate);
+
+  let calendar = findCalendar("Custom");
+  eraseOldEvents(calendar, beginSearchDate, endSearchDate);
+  addNewEvents(calendar, events)
+}
+
+function eraseOldEvents(calendar, beginDate, endDate) {
+  console.log("Erasing old events...Begin");
+  const events = calendar.getEvents(beginDate, endDate);
+  for (let event of events) {
+    if (event.getTag("added_by")) {
+      event.deleteEvent();
+    }
+  }
+  
+  console.log("Erasing old events...Done");
+}
+
+function addNewEvents(calendar, events) {
+  
+  console.log("Adding new events...Begin");
+  for (let event of events) {
+    console.log(`Adding ${event.title} from: ${event.startTime} to: ${event.endTime}`);
+    let ggEvent = calendar.createEvent(
+      event.title,
+      event.startTime,
+      event.endTime
+    );
+    ggEvent.setTag("added_by", event.tags[0]);
+  }
+  
+  console.log("Adding new events...Done");
 }
 
 function createEvents(beginningWeek, currentDate) {
   const data = loadData();
   const groupedByWeek = _(data)
     .groupBy(x => x.Week)
-    .toPairs()
-    .sortBy(x => x[0]) // key
-    .map(x => x[1]) // value
     .value();
 
   const calendarEvents = [];
@@ -47,10 +78,12 @@ function createEvents(beginningWeek, currentDate) {
         calendarEvent.title = subjectName;
         calendarEvent.tags = ["auto_tool"];
 
-        calendarEvent.push(calendarEvent);
+        calendarEvents.push(calendarEvent);
       }
     }
-    
+
+    // set currentDate to saturday to advance to next week
+    currentDate = weekDates[5];
   }
 
   return calendarEvents;
@@ -80,27 +113,29 @@ function mapPeriodToStartEnd(period, weekDayDate) {
   const ticksPerPeriod = minPerPeriod * ticksPerMin;
   const weekDayDateAt0 = createDateInstance(weekDayDate);
 
-  const periodBeginEnd = {};
+  let periodBeginEnd = {};
   // Morning
-  const beginTicks = null;
-  const endTicks = null;
-  const firstPeriodTicks = null;
+  let beginTicks = null;
+  let endTicks = null;
+  let firstPeriodTicks = null;
+  let offset = null;
   if (period <= 5) {
     firstPeriodTicks = ticksPerHour * 7;
-
+    offset = period - 1;
   // After noon
   } else {
     firstPeriodTicks = ticksPerHour * 13;
-    
+    offset = period - 1 - 7 + 1; // 7th period is the first
   }
 
-  beginTicks = weekDayDateAt0.getTime() + firstPeriodTicks + ticksPerHour + period - 1;
-  endTicks = weekDayDateAt0.getTime() + firstPeriodTicks + beginTicks + ticksPerPeriod;
+  let offsetTicks = ticksPerPeriod * offset;
+  beginTicks = weekDayDateAt0.getTime() + firstPeriodTicks + offsetTicks
+  endTicks = weekDayDateAt0.getTime() + firstPeriodTicks  + offsetTicks + ticksPerPeriod;
 
   periodBeginEnd.begin = new Date(beginTicks)
   periodBeginEnd.end = new Date(endTicks);
 
-  return period;
+  return periodBeginEnd;
 }
 
 function createDateInstance(date) {
