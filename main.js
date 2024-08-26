@@ -49,15 +49,23 @@ function createEvents(beginningWeek, currentDate) {
 
   const calendarEvents = [];
 
-  for (let week in groupedByWeek)
+
+  for (let week = 0; week < 20; week++)
   {
     if (parseInt(week) < beginningWeek) {
       continue;
     }
-
-    const weekDates = determineNextWeek(currentDate);
+    
     const weekData = groupedByWeek[week];
+    const weekDates = determineNextWeek(currentDate);
 
+    // set currentDate to saturday to advance to next week
+    currentDate = weekDates[5];
+
+    if (!weekData) {
+      continue;
+    }
+    
     const groupedByWeekDay = Object.groupBy(weekData, x => x.Weekday);
     for (let weekDay in groupedByWeekDay)
     { 
@@ -78,7 +86,7 @@ function createEvents(beginningWeek, currentDate) {
         calendarEvent.startTime = mapPeriodToStartEnd(beginPeriod, weekDayDate).begin;
         calendarEvent.endTime = mapPeriodToStartEnd(endPeriod, weekDayDate).end;
 
-        calendarEvent.title = `${subjectName} - ${room}`;
+        calendarEvent.title = `${subjectName} - ${room} - week ${week}`;
         calendarEvent.tags = ["auto_tool"];
 
         calendarEvents.push(calendarEvent);
