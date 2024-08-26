@@ -8,7 +8,7 @@ function main() {
   const endSearchDate = new Date('2027-08-24T00:00:00');
   let events = createEvents(2, beginSearchDate);
 
-  let calendar = findCalendar("Custom");
+  let calendar = findCalendar("ulaw");
   eraseOldEvents(calendar, beginSearchDate, endSearchDate);
   addNewEvents(calendar, events)
 }
@@ -86,7 +86,7 @@ function createEvents(beginningWeek, currentDate) {
         calendarEvent.startTime = mapPeriodToStartEnd(beginPeriod, weekDayDate).begin;
         calendarEvent.endTime = mapPeriodToStartEnd(endPeriod, weekDayDate).end;
 
-        calendarEvent.title = `${subjectName} - ${room} - week ${week}`;
+        calendarEvent.title = `${subjectName} - ${room}`;
         calendarEvent.tags = ["auto_tool"];
 
         calendarEvents.push(calendarEvent);
