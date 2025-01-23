@@ -4,9 +4,9 @@ var ticksPerHour = 60 * ticksPerMin;
 var ticksPerDay = 24 * ticksPerHour;
 
 function main() {
-  const beginSearchDate = new Date('2024-08-24T00:00:00');
+  const beginSearchDate = new Date('2025-02-14T00:00:00');
   const endSearchDate = new Date('2027-08-24T00:00:00');
-  let events = createEvents(2, beginSearchDate);
+  let events = createEvents(1, beginSearchDate);
 
   let calendar = findCalendar("ulaw");
   eraseOldEvents(calendar, beginSearchDate, endSearchDate);
@@ -16,7 +16,11 @@ function main() {
 function eraseOldEvents(calendar, beginDate, endDate) {
   console.log("Erasing old events...Begin");
   const events = calendar.getEvents(beginDate, endDate);
-  for (let event of events) {
+  for (let i = 0; i < events.length; i++) {
+    let event = events[i];
+    if (i % 10 === 0) {
+      Utilities.sleep(3000);
+    }
     if (event.getTag("added_by")) {
       event.deleteEvent();
     }
@@ -28,7 +32,11 @@ function eraseOldEvents(calendar, beginDate, endDate) {
 function addNewEvents(calendar, events) {
   
   console.log("Adding new events...Begin");
-  for (let event of events) {
+  for (let i = 0; i < events.length; i++) {
+    let event = events[i];
+    if (i % 10 === 0) {
+      Utilities.sleep(3000);
+    }
     console.log(`Adding ${event.title} from: ${event.startTime} to: ${event.endTime}`);
     let ggEvent = calendar.createEvent(
       event.title,
